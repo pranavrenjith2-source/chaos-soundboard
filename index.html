@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>chaos soundboard</title>
+<style>
+body {
+	background: #0d0d0d;
+	color: #39ff14;
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: center;
+	padding: 25px;
+	margin: 0;
+}
+h1 {
+	font-family: Impact, "Comic Sans MS", cursive;
+	font-size: 46px;
+	color: #39ff14;
+	letter-spacing: 4px;
+	text-shadow: 0 0 12px #39ff14, 0 0 25px #39ff14;
+	margin-bottom: 5px;
+}
+h2 {
+    font-family: "Comic Sans MS", cursive;
+	font-size: 17px;
+	color: #b6ff00;
+	margin-top: 0;
+}
+#box {
+	border: 4px dashed #39ff14;
+	background: #161616;
+	max-width: 720px;
+	margin: 20px auto;
+	padding: 18px;
+	box-shadow: 0 0 22px #39ff14;
+}
+#words {
+	width: 60%;
+	padding: 12px;
+	font-size: 16px;
+	background: #000;
+	color: #39ff14;
+	border: 3px solid #39ff14;
+}
+button {
+	background: #39ff14;
+	color: #000;
+	border: 4px solid #b6ff00;
+	padding: 14px 22px;
+	margin: 6px;
+	font-family: Impact, sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+button:hover {
+	background: #000;
+	color: #39ff14;
+	border-color: #39ff14;
+	box-shadow: 0 0 15px #39ff14;
+}
+.slide {
+	display: block;
+	margin: 10px auto;
+}
+label {
+    font-family: "Comic Sans MS", cursive;
+	font-size: 15px;
+	color: #b6ff00;
+}
+input[type=range] {
+	width: 55%;
+	accent-color: #39ff14;
+}
+#msg {
+	font-size: 14px;
+	color: #888;
+	margin-top: 10px;
+}
+#stuff {
+	margin-top: 20px;
+	padding-top: 15px;
+	border-top: 2px solid #39ff14;
+	min-height: 60px;
+}
+</style>
+</head>
+<body>
+
+<h1>CHAOS SOUNDBOARD</h1>
+<h2>type words, get buttons, get noise</h2>
+
+<div id="box">
+	<input type="text" id="words" placeholder="cat, banana, i am the chaos king, lol">
+	<br><br>
+	<button id="go">GENERATE SOUNDBOARD</button>
+	<button id="wipe" onclick="clearAll()">CLEAR</button>
+
+	<div class="slide">
+		<label>PITCH: <span id="pitchVal">1</span></label><br>
+		<input type="range" id="pitch" min="0" max="2" step="0.1" value="1">
+	</div>
+
+	<div class="slide">
+		<label>SPEED: <span id="rateVal">1</span></label><br>
+		<input type="range" id="rate" min="0.1" max="2" step="0.1" value="1">
+	</div>
+
+	<div id="msg">separate your words with commas ok</div>
+
+	<div id="stuff"></div>
+</div>
+
+<script>
+var pitchSlider = document.getElementById('pitch');
+var rateSlider = document.getElementById('rate');
+
+pitchSlider.oninput = function() {
+	document.getElementById('pitchVal').innerHTML = pitchSlider.value;
+};
+
+rateSlider.addEventListener("input", function() {
+	document.getElementById("rateVal").innerHTML = rateSlider.value;
+});
+
+function say(text) {
+	var u = new SpeechSynthesisUtterance(text);
+	u.pitch = parseFloat(document.getElementById("pitch").value);
+	u.rate = parseFloat(document.getElementById("rate").value);
+	u.volume = 1;
+	window.speechSynthesis.cancel();
+	window.speechSynthesis.speak(u);
+}
+
+function makeButton(word) {
+	var b = document.createElement("button");
+    b.innerHTML = word;
+	b.onclick = function() {
+		say(word);
+	};
+	document.getElementById("stuff").appendChild(b);
+}
+
+function generate() {
+	var raw = document.getElementById("words").value;
+	var stuff = document.getElementById("stuff");
+	stuff.innerHTML = "";
+
+	if (raw.length == 0) {
+		document.getElementById("msg").innerHTML = "dude you typed nothing";
+		return;
+	}
+
+	var parts = raw.split(",");
+	var count = 0;
+
+	for (var i = 0; i < parts.length; i++) {
+		var word = parts[i].trim();
+		if (word != "") {
+			makeButton(word);
+			count++;
+		}
+	}
+
+	document.getElementById("msg").innerHTML = "made " + count + " buttons, go wild";
+	console.log("made " + count + " buttons");
+}
+
+function clearAll() {
+	document.getElementById("stuff").innerHTML = "";
+	document.getElementById("words").value = "";
+	document.getElementById("msg").innerHTML = "wiped clean";
+	window.speechSynthesis.cancel();
+}
+
+document.getElementById("go").onclick = generate;
+</script>
+
+</body>
+</html>
